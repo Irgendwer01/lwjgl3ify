@@ -65,6 +65,9 @@ dependencies {
     // Workaround for RFG issue
     patchedMinecraft("net.java.jinput:jinput:2.0.5")
     patchedMinecraft("net.java.jutils:jutils:1.0.0")
+
+    //Mods patched with Mixins
+    compileOnly('curse.maven:cmm-226406:2857869')
 }
 
 minecraft {

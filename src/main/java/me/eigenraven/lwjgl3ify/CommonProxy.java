@@ -1,9 +1,13 @@
 package me.eigenraven.lwjgl3ify;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
-public class CommonProxy {
+import zone.rong.mixinbooter.ILateMixinLoader;
+
+public class CommonProxy implements ILateMixinLoader {
 
     public void registerF3Handler() {}
 
@@ -21,5 +25,12 @@ public class CommonProxy {
         } catch (ReflectiveOperationException e) {
             // ignore - cofh not present
         }
+    }
+
+    @Override
+    public List<String> getMixinConfigs() {
+        ArrayList<String> mixinConfigs = new ArrayList<>();
+        mixinConfigs.add("mixins.lwjgl3ify.late.cmm.json");
+        return mixinConfigs;
     }
 }
