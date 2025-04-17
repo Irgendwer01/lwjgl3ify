@@ -32,7 +32,41 @@ public class EarlyConfig {
         "net.minecraft.util.BlockRenderLayer", "net.minecraft.util.EnumBlockRenderType",
 
         // Wizardry
-        "net.minecraft.util.SoundCategory" };
+        "net.minecraft.util.SoundCategory",
+
+        // Dark Utilities + Actually Additions
+        "net.minecraft.tileentity.BannerPattern",
+
+        // Extra Utilities
+        "net.minecraftforge.common.EnumPlantType",
+
+        // Nomilabs
+        "com.elytradev.architecture.common.shape.EnumShape", "com.projecturanus.betterp2p.item.BetterMemoryCardModes",
+        "com.projecturanus.betterp2p.client.gui.Filter",
+
+        // Quark
+        "net.minecraft.block.BlockChest$Type",
+
+        // Tinkers Construct
+        "net.minecraftforge.common.EnumPlantType",
+
+        // JAOPCA
+        "thelm.jaopca.api.EnumEntryType",
+
+        // Twilight Forest
+        "net.minecraft.client.audio.MusicTicker$MusicType",
+
+        // Forestry
+        "net.minecraftforge.event.terraingen.PopulateChunkEvent$Populate$EventType",
+
+        // MIA
+        "com.buuz135.industrial.tile.misc.FrosterTile$FrosterResult",
+
+        // Bewitchment
+        "thaumcraft.api.golems.EnumGolemTrait",
+
+        // Gravisuite
+        "ic2.core.util.Keyboard$Key", };
 
     public static final Set<String> EXTENSIBLE_ENUMS = new HashSet<>(Arrays.asList(DEFAULT_EXTENSIBLE_ENUMS));
 

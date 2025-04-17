@@ -63,7 +63,6 @@ public class Lwjgl3ifyCoremod implements IFMLLoadingPlugin, IEarlyMixinLoader {
 
         List<String> mixins = new ArrayList<>();
         mixins.add("mixins.lwjgl3ify.early.json");
-
         // Check if VintageFix is loaded
         try {
             Launch.classLoader.findClass("org.embeddedt.vintagefix.core.VintageFixCore");

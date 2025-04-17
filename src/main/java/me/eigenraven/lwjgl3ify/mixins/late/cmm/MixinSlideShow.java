@@ -18,7 +18,7 @@ public class MixinSlideShow {
     public ITexture[] ressources;
 
     /**
-     * @author Irgendwe01
+     * @author Irgendwer01
      * @reason Fix CustomMainMenu crashing, casting list.toArray() to smth else will cause a crash in newer Java
      *         versions
      */

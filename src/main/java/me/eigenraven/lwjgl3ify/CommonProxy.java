@@ -31,6 +31,8 @@ public class CommonProxy implements ILateMixinLoader {
     public List<String> getMixinConfigs() {
         ArrayList<String> mixinConfigs = new ArrayList<>();
         mixinConfigs.add("mixins.lwjgl3ify.late.cmm.json");
+        mixinConfigs.add("mixins.lwjgl3ify.late.sfr.json");
+        mixinConfigs.add("mixins.lwjgl3ify.late.plustic.json");
         return mixinConfigs;
     }
 }

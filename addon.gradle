@@ -1,10 +1,12 @@
 //import com.modrinth.minotaur.ModrinthExtension
+
 import org.apache.tools.ant.filters.ReplaceTokens
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.stream.Collectors
 import java.nio.charset.StandardCharsets
+
 
 def taskGroup = "lwjgl3ify"
 
@@ -89,6 +91,7 @@ configurations {
 
 SourceSet hotswapSet;
 SourceSet relauncherStubSet;
+SourceSet forgePatchesSrc;
 
 sourceSets {
     create("util")
@@ -100,6 +103,9 @@ sourceSets {
         java {
             srcDir("src/generated/java")
         }
+    }
+    forgePatchesSrc = create("forgePatches") {
+        compileClasspath += forgePatchesEmbedded
     }
 }
 
@@ -148,6 +154,7 @@ def forgePatchesJar = tasks.register('forgePatchesJar', Jar) {
         include("me/eigenraven/lwjgl3ify/rfb/entry/ServerMain.class")
     }
     from(relauncherStubSet.output)
+    from(forgePatchesSrc.output)
     inputs.property("version", project.version.toString())
     from(resources.text.fromString(project.version.toString()).asFile()) {
         rename {"META-INF/lwjgl3ify-forgePatches-version.txt"}
@@ -348,19 +355,19 @@ for (runTask in [tasks.runObfClient, tasks.runObfServer]) {
 
 def originalLaunchWrapperPath = project.layout.buildDirectory.file("launchwrapper-1.12.jar").get().asFile
 
-//import com.gtnewhorizons.retrofuturagradle.minecraft.RunMinecraftTask
-//import com.gtnewhorizons.retrofuturagradle.util.Distribution
-/*def runWithRelauncher = tasks.register("runClientWithRelauncher", com.gtnewhorizons.retrofuturagradle.minecraft.RunMinecraftTask.class, Distribution.CLIENT, gradle)
+// Workaround because we can only import plugin classes in build.gradle
+def runWithRelauncher = tasks.register("runWithRelauncher", tasks.runClient.getClass(), tasks.runClient.getClass().getClassLoader().loadClass("com.gtnewhorizons.retrofuturagradle.util.Distribution").CLIENT, gradle)
 runWithRelauncher.configure {
+
     setup(project)
     group = "lwjgl3ify"
     description = "Runs the deobfuscated client while triggering the relauncher"
     dependsOn(
-        sourceSets.mcLauncher.map { it.classesTaskName },
+        sourceSets.named("mcLauncher").map { it.classesTaskName },
         tasks.downloadVanillaAssets,
         tasks.packagePatchedMc,
         tasks.reobfJar,
-        "jar"
+        tasks.build,
     )
 
     username = minecraft.username
@@ -384,7 +391,7 @@ runWithRelauncher.configure {
             overwrite(false)
         }
     }
-}*/
+}
 
 tasks.runObfClient {
     mainClass.set("com.gtnewhorizons.retrofuturabootstrap.Main")

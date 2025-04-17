@@ -11,7 +11,8 @@
     "fml.ItemStackHolderRef",
     "fml.JarDiscoverer",
     "fml.ObjectHolderRef",
-    "fml.ObjectHolderRegistry"
+    "fml.ObjectHolderRegistry",
+    "fml.LoadController"
   ],
   "client": [
     "game.MixinMinecraftKeyBinding"
