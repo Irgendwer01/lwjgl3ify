@@ -48,6 +48,7 @@ public class EnumHelper {
      * @author TwilightFlower
      * @reason Completely changed reflection logic for Java 9+ compatibility and simplification
      */
+    @Nullable
     @Overwrite
     @SuppressWarnings("unchecked")
     private static <T extends Enum<?>> T addEnum(boolean test, final Class<T> enumType, @Nullable String enumName,
@@ -64,10 +65,10 @@ public class EnumHelper {
         MethodType ctorCacheType = MethodType.methodType(enumType, actualParamTypes);
 
         MethodHandle constructor = ENUM_CONSTRUCTOR_CACHE
-            .computeIfAbsent(ctorCacheType, EnumHelper::findConstructorHandle);
-        Field valuesField = ENUM_VALUES_FIELD_CACHE.computeIfAbsent(enumType, EnumHelper::findValuesField);
+            .computeIfAbsent(ctorCacheType, EnumHelper::lwjgl3ify$findConstructorHandle);
+        Field valuesField = ENUM_VALUES_FIELD_CACHE.computeIfAbsent(enumType, EnumHelper::lwjgl3ify$findValuesField);
 
-        // i don't know why this exists
+        // I don't know why this exists
         if (test) {
             return null;
         }
@@ -82,7 +83,15 @@ public class EnumHelper {
             synchronized (enumType) {
                 T[] values = (T[]) valuesField.get(null);
                 actualParams[1] = values.length;
-                T newValue = (T) constructor.invokeWithArguments(actualParams);
+                T newValue;
+                if (constructor.isVarargsCollector()) {
+                    Object[] paramsWithoutVarArgs = new Object[actualParamTypes.length - 1];
+                    System.arraycopy(actualParams, 0, paramsWithoutVarArgs, 0, actualParams.length - 1);
+                    newValue = (T) constructor
+                        .invokeWithArguments(lwjgl3ify$mergeArrays(paramsWithoutVarArgs, actualParams[actualParams.length - 1]));
+                } else {
+                    newValue = (T) constructor.invokeWithArguments(actualParams);
+                }
                 T[] newValues = ArrayUtils.add(values, newValue);
                 valuesField.set(null, newValues);
                 return newValue;
@@ -93,7 +102,45 @@ public class EnumHelper {
     }
 
     @Unique
-    private static MethodHandle findConstructorHandle(@NotNull MethodType cacheType) {
+    @SuppressWarnings({ "unchecked", "PrimitiveArrayArgumentToVariableArgMethod" })
+    private static <T> T[] lwjgl3ify$mergeArrays(T array1, T array2) {
+        if (array2.getClass()
+            .getComponentType()
+            .isPrimitive()) {
+            switch (array2.getClass()
+                .getComponentType()
+                .getName()) {
+                case "int": {
+                    return (T[]) ArrayUtils.addAll((T[]) array1, (int[]) array2);
+                }
+                case "double": {
+                    return (T[]) ArrayUtils.addAll((T[]) array1, (double[]) array2);
+                }
+                case "float": {
+                    return (T[]) ArrayUtils.addAll((T[]) array1, (float[]) array2);
+                }
+                case "long": {
+                    return (T[]) ArrayUtils.addAll((T[]) array1, (long[]) array2);
+                }
+                case "short": {
+                    return (T[]) ArrayUtils.addAll((T[]) array1, (short[]) array2);
+                }
+                case "byte": {
+                    return (T[]) ArrayUtils.addAll((T[]) array1, (byte[]) array2);
+                }
+                case "char": {
+                    return (T[]) ArrayUtils.addAll((T[]) array1, (char[]) array2);
+                }
+                case "boolean": {
+                    return (T[]) ArrayUtils.addAll((T[]) array1, (boolean[]) array2);
+                }
+            }
+        }
+        return ArrayUtils.addAll((T[]) array1, (T[]) array2);
+    }
+
+    @Unique
+    private static MethodHandle lwjgl3ify$findConstructorHandle(@NotNull MethodType cacheType) {
         Class<?> on = cacheType.returnType();
         MethodType ctorType = cacheType.changeReturnType(void.class);
 
@@ -108,7 +155,7 @@ public class EnumHelper {
     }
 
     @Unique
-    private static Field findValuesField(@NotNull Class<?> enumClass) {
+    private static Field lwjgl3ify$findValuesField(@NotNull Class<?> enumClass) {
         for (Field field : enumClass.getDeclaredFields()) {
             if (field.isAnnotationPresent(EnumValuesField.class)) {
                 return field;
