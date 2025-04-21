@@ -56,6 +56,7 @@ dependencies {
 
     //Needed by Fluidlogged API
     forgePatchesEmbedded("org.glassfish.corba:glassfish-corba-orb:5.0.0")
+    forgePatchesEmbedded("jakarta.xml.ws:jakarta.xml.ws-api:4.0.2")
 
     shadowImplementation("com.github.weisj:darklaf-core:3.0.2")
 
