@@ -259,6 +259,8 @@ tasks.shadowJar {
     from(versionJsonFile) {
         rename { "me/eigenraven/lwjgl3ify/relauncher/version.json" }
     }
+
+    relocate("kotlin", "logisticspipes.kotlin") // Lazy workaround to fix LP
 }
 
 def versionJsonArtifact = artifacts.add("versionJsonElements", versionJsonPath) {

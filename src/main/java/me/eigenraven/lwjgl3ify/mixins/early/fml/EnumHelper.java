@@ -87,8 +87,8 @@ public class EnumHelper {
                 if (constructor.isVarargsCollector()) {
                     Object[] paramsWithoutVarArgs = new Object[actualParamTypes.length - 1];
                     System.arraycopy(actualParams, 0, paramsWithoutVarArgs, 0, actualParams.length - 1);
-                    newValue = (T) constructor
-                        .invokeWithArguments(lwjgl3ify$mergeArrays(paramsWithoutVarArgs, actualParams[actualParams.length - 1]));
+                    newValue = (T) constructor.invokeWithArguments(
+                        lwjgl3ify$mergeArrays(paramsWithoutVarArgs, actualParams[actualParams.length - 1]));
                 } else {
                     newValue = (T) constructor.invokeWithArguments(actualParams);
                 }

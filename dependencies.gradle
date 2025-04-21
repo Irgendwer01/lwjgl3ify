@@ -58,6 +58,9 @@ dependencies {
     forgePatchesEmbedded("org.glassfish.corba:glassfish-corba-orb:5.0.0")
     forgePatchesEmbedded("jakarta.xml.ws:jakarta.xml.ws-api:4.0.2")
 
+    //Needed by LP
+    shadowImplementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.10")
+
     shadowImplementation("com.github.weisj:darklaf-core:3.0.2")
 
     // Workaround for RFG issue
@@ -68,6 +71,7 @@ dependencies {
     compileOnly('curse.maven:cmm-226406:2857869')
     compileOnly('curse.maven:sfr-246974:3050838')
     compileOnly('curse.maven:plustic-376903:4703532')
+    compileOnly('curse.maven:lp-232838:4849512')
 }
 
 minecraft {
