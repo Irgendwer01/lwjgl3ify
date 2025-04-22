@@ -12,35 +12,32 @@ import com.gtnewhorizons.retrofuturabootstrap.api.ClassNodeHandle;
 import com.gtnewhorizons.retrofuturabootstrap.api.ExtensibleClassLoader;
 import com.gtnewhorizons.retrofuturabootstrap.api.RfbClassTransformer;
 
-public class LPTransformer implements RfbClassTransformer {
+public class ChiselAndBitsTransformer implements RfbClassTransformer {
 
     @Pattern("[a-z0-9-]+")
     @Override
     public @NotNull String id() {
-        return "lp-transformer";
+        return "chiselandbits-transformer";
     }
 
     @Override
     public boolean shouldTransformClass(@NotNull ExtensibleClassLoader classLoader, @NotNull Context context,
         @Nullable Manifest manifest, @NotNull String className, @NotNull ClassNodeHandle classNode) {
-        return className.equals("logisticspipes.asm.td.ClassRenderDuctItemsHandler");
+        return className.equals("mod.chiselsandbits.config.ModConfig");
     }
 
-    // LP crashes the game specifically if a method from TD does not have a specific checksum,
-    // since this is different, we set the boolean to false so it won't do that
+    // Chisels & Bits never calls setAccessible when trying to modify its fields, thus erroring when trying to set a
+    // private field, so we make that specific field public.
     @Override
     public void transformClass(@NotNull ExtensibleClassLoader classLoader, @NotNull Context context,
         @Nullable Manifest manifest, @NotNull String className, @NotNull ClassNodeHandle classNode) {
         ClassNode node = classNode.getNode();
         if (node != null) {
-            for (MethodNode methodNode : node.methods) {
-                if (methodNode.name.equals("handleRenderDuctItemsClass")) {
-                    for (AbstractInsnNode abstractInsnNode : methodNode.instructions) {
-                        if (abstractInsnNode instanceof InsnNode insnNode && insnNode.getOpcode() == Opcodes.ICONST_1) {
-                            methodNode.instructions.set(insnNode, new InsnNode(Opcodes.ICONST_0));
-                            break;
-                        }
-                    }
+            for (FieldNode field : node.fields) {
+                if (field.name.equals("showUsage")) {
+                    field.access &= ~Opcodes.ACC_PRIVATE;
+                    field.access |= Opcodes.ACC_PUBLIC;
+                    break;
                 }
             }
         }

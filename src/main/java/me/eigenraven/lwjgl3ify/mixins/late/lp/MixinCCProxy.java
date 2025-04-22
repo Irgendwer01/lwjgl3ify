@@ -9,7 +9,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import logisticspipes.proxy.cc.CCProxy;
 
 // LP tries to access a Field in Thread which does not exist anymore, thus we return null in getDeclaredField and do
-// nothing when calling setAccessible as well for no errors in log, see MainProxy$getEffectiveSide for where it was used.
+// nothing when calling setAccessible as well for no errors in log, see MainProxy$getEffectiveSide for where it was
+// used.
 @Mixin(value = CCProxy.class, remap = false)
 public class MixinCCProxy {
 

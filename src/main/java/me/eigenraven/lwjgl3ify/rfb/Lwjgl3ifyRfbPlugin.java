@@ -18,10 +18,7 @@ import com.gtnewhorizons.retrofuturabootstrap.api.RfbClassTransformer;
 import com.gtnewhorizons.retrofuturabootstrap.api.RfbPlugin;
 
 import me.eigenraven.lwjgl3ify.rfb.transformers.*;
-import me.eigenraven.lwjgl3ify.rfb.transformers.mod.EnderCoreTransformer;
-import me.eigenraven.lwjgl3ify.rfb.transformers.mod.LPTransformer;
-import me.eigenraven.lwjgl3ify.rfb.transformers.mod.LagGogglesTransformer;
-import me.eigenraven.lwjgl3ify.rfb.transformers.mod.ZenUtilsTransformer;
+import me.eigenraven.lwjgl3ify.rfb.transformers.mod.*;
 
 public class Lwjgl3ifyRfbPlugin implements RfbPlugin {
 
@@ -52,7 +49,8 @@ public class Lwjgl3ifyRfbPlugin implements RfbPlugin {
     public @NotNull RfbClassTransformer @Nullable [] makeTransformers() {
         return new RfbClassTransformer[] { new LwjglRedirectTransformer(), new ExtensibleEnumTransformer(),
             new UnfinalizeObjectHoldersTransformer(), new ForgePatchTransformer(), new LagGogglesTransformer(),
-            new EnderCoreTransformer(), new ZenUtilsTransformer(), new LPTransformer() };
+            new EnderCoreTransformer(), new ZenUtilsTransformer(), new LPTransformer(),
+            new ChiselAndBitsTransformer() };
     }
 
     private void verifyJavaVersion() {

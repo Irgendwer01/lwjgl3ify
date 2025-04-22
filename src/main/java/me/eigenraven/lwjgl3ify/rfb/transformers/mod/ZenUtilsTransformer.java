@@ -2,6 +2,7 @@ package me.eigenraven.lwjgl3ify.rfb.transformers.mod;
 
 import java.util.jar.Manifest;
 
+import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
@@ -14,6 +15,7 @@ import com.gtnewhorizons.retrofuturabootstrap.api.RfbClassTransformer;
 
 public class ZenUtilsTransformer implements RfbClassTransformer {
 
+    @Pattern("[a-z0-9-]+")
     @Override
     public @NotNull String id() {
         return "zenutils-transformer";
