@@ -12,7 +12,7 @@ public class MixinInjector {
 
     /**
      * @author Irgendwer01
-     * @reason Old one seems like it didn't work, so we directly call Unsafe
+     * @reason Only passing the class via className.class will not initialize the class, thus we call Class.forName to ensure it gets initialized
      */
     @Overwrite
     public void inject(Class<?> apiClass, String fieldName, Object value) {
