@@ -12,7 +12,8 @@ public class MixinInjector {
 
     /**
      * @author Irgendwer01
-     * @reason Only passing the class via className.class will not initialize the class, thus we call Class.forName to ensure it gets initialized
+     * @reason Only passing the class via className.class will not initialize the class, thus we call Class.forName to
+     *         ensure it gets initialized
      */
     @Overwrite
     public void inject(Class<?> apiClass, String fieldName, Object value) {
