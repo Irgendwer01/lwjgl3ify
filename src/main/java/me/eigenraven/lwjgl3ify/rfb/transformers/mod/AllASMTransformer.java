@@ -49,6 +49,7 @@ public class AllASMTransformer implements RfbClassTransformer {
                                 && fieldInsnNode1.name.equals("packageStringCanonicalization")) {
                                 methodNode.instructions.remove(fieldInsnNode);
                                 methodNode.instructions.set(fieldInsnNode1, new InsnNode(Opcodes.ICONST_0));
+                                break;
                             }
                         }
                     }
