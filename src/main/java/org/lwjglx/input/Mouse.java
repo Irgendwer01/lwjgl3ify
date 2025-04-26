@@ -42,7 +42,8 @@ public class Mouse {
     private static int[] lastxEvents = new int[queue.getMaxEvents()];
     private static int[] lastyEvents = new int[queue.getMaxEvents()];
     private static long[] nanoTimeEvents = new long[queue.getMaxEvents()];
-    private static int event_dwheel = 0; // TODO: Find out if there are Mods which need the other events to be reverted back as well
+    private static int event_dwheel = 0; // TODO: Find out if there are Mods which need the other events to be reverted
+                                         // back as well
 
     private static boolean clipPostionToDisplay = true;
     private static int ignoreNextDelta = 0;

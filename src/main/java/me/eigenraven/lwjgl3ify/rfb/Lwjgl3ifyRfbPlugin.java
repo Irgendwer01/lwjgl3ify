@@ -49,8 +49,8 @@ public class Lwjgl3ifyRfbPlugin implements RfbPlugin {
     public @NotNull RfbClassTransformer @Nullable [] makeTransformers() {
         return new RfbClassTransformer[] { new LwjglRedirectTransformer(), new ExtensibleEnumTransformer(),
             new UnfinalizeObjectHoldersTransformer(), new ForgePatchTransformer(), new LagGogglesTransformer(),
-            new EnderCoreTransformer(), new ZenUtilsTransformer(), new LPTransformer(),
-            new ChiselAndBitsTransformer() };
+            new EnderCoreTransformer(), new ZenUtilsTransformer(), new LPTransformer(), new ChiselAndBitsTransformer(),
+            new AllASMTransformer() };
     }
 
     private void verifyJavaVersion() {
