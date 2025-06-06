@@ -53,8 +53,8 @@ def addOpens = [
 
 def extraJavaArgs = [
     "-Dfile.encoding=UTF-8",
-    "-Djava.system.class.loader=com.gtnewhorizons.retrofuturabootstrap.RfbSystemClassLoader",
-)
+    "-Djava.system.class.loader=com.gtnewhorizons.retrofuturabootstrap.RfbSystemClassLoader"
+]
 for (openSpec in addOpens) {
     extraJavaArgs += ["--add-opens", openSpec]
 }

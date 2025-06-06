@@ -100,8 +100,7 @@ public class EarlyConfig {
         // Bewitchment
         "thaumcraft.api.golems.EnumGolemTrait",
         // Gravisuite
-        "ic2.core.util.Keyboard$Key",
-    };
+        "ic2.core.util.Keyboard$Key", };
 
     public static final Set<String> EXTENSIBLE_ENUMS = new HashSet<>(Arrays.asList(DEFAULT_EXTENSIBLE_ENUMS));
 
