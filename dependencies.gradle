@@ -73,7 +73,6 @@ dependencies {
     //Mods patched with Mixins
     compileOnly('curse.maven:cmm-226406:2857869')
     compileOnly('curse.maven:sfr-246974:3050838')
-    compileOnly('curse.maven:plustic-376903:4703532')
     compileOnly('curse.maven:lp-232838:4849512')
     compileOnly('curse.maven:athenaeum-284350:4633750')
 }
