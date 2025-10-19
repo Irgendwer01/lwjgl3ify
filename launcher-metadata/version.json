@@ -98,8 +98,8 @@
     },
     "id": "1.12.2-forge-14.23.5.2860",
     "javaVersion": {
-        "component": "java-runtime-gamma",
-        "majorVersion": 17
+        "component": "java-runtime-delta",
+        "majorVersion": 21
     },
     "libraries": [
         {
