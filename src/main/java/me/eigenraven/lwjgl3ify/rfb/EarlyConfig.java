@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import com.google.gson.Gson;
@@ -58,13 +59,46 @@ public class EarlyConfig {
 
         // Forestry
         "net.minecraftforge.event.terraingen.PopulateChunkEvent$Populate$EventType",
+        "net.minecraftforge.event.terraingen.InitMapGenEvent$EventType",
+        "net.minecraftforge.event.terraingen.OreGenEvent$GenerateMinable$EventType",
+        "net.minecraftforge.event.terraingen.DecorateBiomeEvent$Decorate$EventType",
+        // From GTNH crashes
+        "vswe.stevesfactory.Localization", "vswe.stevesfactory.blocks.ClusterMethodRegistration",
+        "vswe.stevesfactory.blocks.ConnectionBlockType", "vswe.stevesfactory.components.ComponentType",
+        "vswe.stevesfactory.components.ConnectionSet", "vswe.stevesfactory.components.ConnectionOption",
+        "ic2.core.init.InternalName", "gregtech.api.enums.Element", "gregtech.api.enums.OrePrefixes",
+        "net.minecraft.client.audio.MusicTicker$MusicType", "org.bukkit.Material",
+        "buildcraft.api.transport.IPipeTile$PipeType", "thaumcraft.common.entities.golems.EnumGolemType",
+        // Non-GTNH Mods Compat
+        // The Lord of the Rings Mod: Legacy
+        "net.minecraft.event.HoverEvent$Action",
+        // LotR Addons
+        "lotr.common.fac.LOTRFaction", "lotr.common.quest.LOTRMiniQuestFactory", "lotr.common.world.map.LOTRWaypoint",
+        "lotr.common.world.map.LOTRWaypoint$Region", "lotr.common.world.spawning.LOTRInvasions",
+        "lotr.common.LOTRShields", "lotr.common.LOTRDimension$DimensionRegion",
+        "lotr.common.item.LOTRItemBanner$BannerType", "lotr.common.LOTRAchievement$Category",
+        "lotr.client.gui.LOTRMapLabels",
+        // Reika's mods
+        "net.minecraft.client.audio.SoundCategory",
+        "Reika.RotaryCraft.TileEntities.Processing.TileEntityFuelConverter$Conversions",
+        "Reika.DragonAPI.ModInteract.Bees.BeeAlleleRegistry$Fertility",
+        "Reika.DragonAPI.ModInteract.Bees.BeeAlleleRegistry$Speeds",
+        "Reika.DragonAPI.ModInteract.Bees.BeeAlleleRegistry$Flowering",
+        "Reika.DragonAPI.ModInteract.Bees.BeeAlleleRegistry$Territory",
+        "Reika.DragonAPI.ModInteract.Bees.BeeAlleleRegistry$Life",
+        "Reika.DragonAPI.ModInteract.Bees.ButterflyAlleleRegistry$Fertility",
+        "Reika.DragonAPI.ModInteract.Bees.ButterflyAlleleRegistry$Life",
+        // Et Futurum Requiem
+        "net.minecraft.world.WorldSettings$GameType",
+        "ganymedes01.etfuturum.tileentities.TileEntityBanner$EnumBannerPattern",
+        // EnderIO Addons
+        "crazypants.enderio.ModObject",
+        //
 
         // MIA
         "com.buuz135.industrial.tile.misc.FrosterTile$FrosterResult",
-
         // Bewitchment
         "thaumcraft.api.golems.EnumGolemTrait",
-
         // Gravisuite
         "ic2.core.util.Keyboard$Key", };
 
@@ -95,7 +129,10 @@ public class EarlyConfig {
                 final String earlyConfigContents = new String(
                     Files.readAllBytes(earlyConfigPath),
                     StandardCharsets.UTF_8);
-                cfg = gson.fromJson(earlyConfigContents, ConfigObject.class);
+                ConfigObject parsedConfig = gson.fromJson(earlyConfigContents, ConfigObject.class);
+                if (Objects.nonNull(parsedConfig)) {
+                    cfg = parsedConfig;
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

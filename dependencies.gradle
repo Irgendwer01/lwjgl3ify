@@ -3,8 +3,11 @@ minecraft {
     lwjgl3Version = "3.3.3"
 }
 
-def asmVersion = '9.7.1'
-def rfbVersion = '1.0.10'
+//def addGtForTesting = Boolean.parseBoolean(project.getProperties().getOrDefault("withGregtech", "false").toString())
+//def addReikaModsForTesting = Boolean.parseBoolean(project.getProperties().getOrDefault("withReikaMods", "false").toString())
+
+def asmVersion = '9.8'
+def rfbVersion = '1.0.11'
 // 100% binary compatible, 1 minor source compatibility issue (removed a throws IOException clause)
 def gsonVersion = '2.10.1'
 
@@ -70,7 +73,6 @@ dependencies {
     //Mods patched with Mixins
     compileOnly('curse.maven:cmm-226406:2857869')
     compileOnly('curse.maven:sfr-246974:3050838')
-    compileOnly('curse.maven:plustic-376903:4703532')
     compileOnly('curse.maven:lp-232838:4849512')
     compileOnly('curse.maven:athenaeum-284350:4633750')
 }
