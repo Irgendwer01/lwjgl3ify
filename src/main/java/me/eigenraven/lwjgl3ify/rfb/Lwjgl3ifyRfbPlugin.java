@@ -50,7 +50,7 @@ public class Lwjgl3ifyRfbPlugin implements RfbPlugin {
         return new RfbClassTransformer[] { new LwjglRedirectTransformer(), new ExtensibleEnumTransformer(),
             new UnfinalizeObjectHoldersTransformer(), new ForgePatchTransformer(), new LagGogglesTransformer(),
             new EnderCoreTransformer(), new ZenUtilsTransformer(), new LPTransformer(), new ChiselAndBitsTransformer(),
-            new AllASMTransformer() };
+            new AllASMTransformer(), new LadyLibTransformer() };
     }
 
     private void verifyJavaVersion() {
