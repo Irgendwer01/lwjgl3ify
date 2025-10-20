@@ -2,10 +2,6 @@ minecraft {
     mainLwjglVersion = 3
     lwjgl3Version = "3.3.3"
 }
-
-//def addGtForTesting = Boolean.parseBoolean(project.getProperties().getOrDefault("withGregtech", "false").toString())
-//def addReikaModsForTesting = Boolean.parseBoolean(project.getProperties().getOrDefault("withReikaMods", "false").toString())
-
 def asmVersion = '9.8'
 def rfbVersion = '1.0.11'
 // 100% binary compatible, 1 minor source compatibility issue (removed a throws IOException clause)
@@ -15,6 +11,33 @@ configurations.configureEach {
     resolutionStrategy.dependencySubstitution {
         substitute module('net.minecraft:launchwrapper') using module("com.gtnewhorizons.retrofuturabootstrap:RetroFuturaBootstrap:${rfbVersion}") because("LW replacement")
     }
+}
+
+def enable_custommainmenu = false
+def enable_solarfluxreborn = false
+def enable_plustic = false
+def enable_logisticspipes = false
+def enable_athenaeum = false
+def enable_gaspunk = false
+def enable_universaltweaks = false
+
+
+def modDeps = [
+    'curse.maven:cmm-226406:2857869': enable_custommainmenu,
+    'curse.maven:sfr-246974:3050838': enable_solarfluxreborn,
+    'curse.maven:plustic-376903:4703532': enable_plustic,
+    'curse.maven:lp-232838:4849512': enable_logisticspipes,
+    'curse.maven:athenaeum-284350:4633750': enable_athenaeum,
+    'curse.maven:gaspunk-286505:3048663': enable_gaspunk,
+    'com.github.Ladysnake:LadyLib:69e91b9': enable_gaspunk,
+    'curse.maven:ut-705000:6959247': enable_universaltweaks,
+
+    // Dependencies needed by other Mods, thus letting them always on
+    'com.cleanroommc:configanytime:3.0': true,
+]
+
+repositories {
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -70,12 +93,13 @@ dependencies {
     patchedMinecraft("net.java.jinput:jinput:2.0.5")
     patchedMinecraft("net.java.jutils:jutils:1.0.0")
 
-    //Mods patched with Mixins
-    compileOnly('curse.maven:cmm-226406:2857869')
-    compileOnly('curse.maven:sfr-246974:3050838')
-    compileOnly('curse.maven:plustic-376903:4703532')
-    compileOnly('curse.maven:lp-232838:4849512')
-    compileOnly('curse.maven:athenaeum-284350:4633750')
+    modDeps.entrySet().forEach {
+        if (it.value) {
+            implementation it.key
+        } else {
+            compileOnly it.key
+        }
+    }
 }
 
 minecraft {
