@@ -26,7 +26,8 @@ public class LadyLibTransformer implements RfbClassTransformer {
         return className.equals("ladylib.registration.internal.AutoRegistrar");
     }
 
-    // Ladylib checks if fields are final that use their annotation, but we unfinalize all ObjectHolder, so we just return true
+    // Ladylib checks if fields are final that use their annotation, but we unfinalize all ObjectHolder, so we just
+    // return true
     @Override
     public void transformClass(@NotNull ExtensibleClassLoader classLoader, @NotNull Context context,
         @Nullable Manifest manifest, @NotNull String className, @NotNull ClassNodeHandle classNode) {

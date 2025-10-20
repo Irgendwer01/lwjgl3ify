@@ -47,7 +47,7 @@ public class Lwjgl3ifyRfbPlugin implements RfbPlugin {
         // TODO: Look into why these get loaded with LWJGL3ify
         // Unload classes which shouldn't be loaded on serverside
         try {
-            Launch.classLoader.findClass("net.minecraft.client.Minecraft");
+            Class.forName("net.minecraft.client.AnvilConverterException", false, Launch.classLoader);
         } catch (ClassNotFoundException ignored) {
             Launch.classLoader.addClassLoaderExclusion("landmaster.plustic.api.Toggle$Gui");
         }
