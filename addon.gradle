@@ -324,7 +324,7 @@ runComparisonTool.configure {
 
 def veryNewJavaToolchainSpec = {
     it.vendor = JvmVendorSpec.AZUL
-    it.languageVersion = JavaLanguageVersion.of(21)
+    it.languageVersion = JavaLanguageVersion.of(24)
 }
 
 def newJavaLauncher = javaToolchains.launcherFor(veryNewJavaToolchainSpec)

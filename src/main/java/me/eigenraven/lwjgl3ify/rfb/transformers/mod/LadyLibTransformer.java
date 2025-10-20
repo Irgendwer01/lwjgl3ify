@@ -26,8 +26,7 @@ public class LadyLibTransformer implements RfbClassTransformer {
         return className.equals("ladylib.registration.internal.AutoRegistrar");
     }
 
-    // LP crashes the game specifically if a method from TD does not have a specific checksum,
-    // since this is different, we set the boolean to false so it won't do that
+    // Ladylib checks if fields are final that use their annotation, but we unfinalize all ObjectHolder, so we just return true
     @Override
     public void transformClass(@NotNull ExtensibleClassLoader classLoader, @NotNull Context context,
         @Nullable Manifest manifest, @NotNull String className, @NotNull ClassNodeHandle classNode) {

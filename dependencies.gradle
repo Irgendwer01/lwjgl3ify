@@ -15,25 +15,37 @@ configurations.configureEach {
 
 def enable_custommainmenu = false
 def enable_solarfluxreborn = false
-def enable_plustic = false
 def enable_logisticspipes = false
 def enable_athenaeum = false
 def enable_gaspunk = false
 def enable_universaltweaks = false
+def enable_ic2 = false
+def enable_tconstruct = true
+def enable_botania = true
 
 
 def modDeps = [
     'curse.maven:cmm-226406:2857869': enable_custommainmenu,
     'curse.maven:sfr-246974:3050838': enable_solarfluxreborn,
-    'curse.maven:plustic-376903:4703532': enable_plustic,
     'curse.maven:lp-232838:4849512': enable_logisticspipes,
     'curse.maven:athenaeum-284350:4633750': enable_athenaeum,
     'curse.maven:gaspunk-286505:3048663': enable_gaspunk,
     'com.github.Ladysnake:LadyLib:69e91b9': enable_gaspunk,
     'curse.maven:ut-705000:6959247': enable_universaltweaks,
+    'curse.maven:ic2-242638:3838713' : enable_ic2,
+    'curse.maven:gravisuite-253590:2700845' : enable_ic2,
+    'curse.maven:tconstruct-74072:2902483' : enable_tconstruct,
+    'curse.maven:plustic-376903:4703532': enable_tconstruct,
+    'curse.maven:mantle-74924:2713386' : enable_tconstruct,
+    'curse.maven:botania-225643:3330934' : enable_botania,
 
     // Dependencies needed by other Mods, thus letting them always on
     'com.cleanroommc:configanytime:3.0': true,
+    'curse.maven:baubles-227083:2518667': true,
+
+    // Cannot be used in runClient (Needs fixing in RFG)
+    'curse.maven:EIO-64578:4674244': false,
+    'curse.maven:EnderCore-231868:4671384': false
 ]
 
 repositories {
@@ -95,9 +107,9 @@ dependencies {
 
     modDeps.entrySet().forEach {
         if (it.value) {
-            implementation it.key
+            implementation rfg.deobf(it.key)
         } else {
-            compileOnly it.key
+            compileOnly rfg.deobf(it.key)
         }
     }
 }

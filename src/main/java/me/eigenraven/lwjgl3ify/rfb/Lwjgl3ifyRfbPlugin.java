@@ -43,6 +43,14 @@ public class Lwjgl3ifyRfbPlugin implements RfbPlugin {
         Launch.classLoader.addClassLoaderExclusion("com.sun.istack.");
         Launch.classLoader.addTransformerExclusion("org.lwjgl.");
         Launch.classLoader.addTransformerExclusion("org.lwjglx.");
+
+        // TODO: Look into why these get loaded with LWJGL3ify
+        // Unload classes which shouldn't be loaded on serverside
+        try {
+            Launch.classLoader.findClass("net.minecraft.client.Minecraft");
+        } catch (ClassNotFoundException ignored) {
+            Launch.classLoader.addClassLoaderExclusion("landmaster.plustic.api.Toggle$Gui");
+        }
     }
 
     @Override

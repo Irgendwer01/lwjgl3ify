@@ -12,7 +12,9 @@
     "fml.JarDiscoverer",
     "fml.ObjectHolderRef",
     "fml.ObjectHolderRegistry",
-    "fml.LoadController"
+    "fml.LoadController",
+    "fml.CapabilityManager",
+    "fml.ForgeModContainer"
   ],
   "client": [
     "game.MixinMinecraftKeyBinding"
