@@ -35,6 +35,7 @@ public class CommonProxy implements ILateMixinLoader {
         mixinConfigs.add("mixins.lwjgl3ify.late.plustic.json");
         mixinConfigs.add("mixins.lwjgl3ify.late.lp.json");
         mixinConfigs.add("mixins.lwjgl3ify.late.athenaeum.json");
+        mixinConfigs.add("mixins.lwjgl3ify.late.gravisuite.json");
         return mixinConfigs;
     }
 }

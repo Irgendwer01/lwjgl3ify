@@ -20,7 +20,7 @@ def enable_athenaeum = false
 def enable_gaspunk = false
 def enable_universaltweaks = false
 def enable_ic2 = false
-def enable_tconstruct = true
+def enable_tconstruct = false
 def enable_botania = true
 
 
