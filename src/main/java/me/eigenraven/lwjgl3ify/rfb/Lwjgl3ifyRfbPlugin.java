@@ -17,6 +17,7 @@ import com.gtnewhorizons.retrofuturabootstrap.api.PluginContext;
 import com.gtnewhorizons.retrofuturabootstrap.api.RfbClassTransformer;
 import com.gtnewhorizons.retrofuturabootstrap.api.RfbPlugin;
 
+import me.eigenraven.lwjgl3ify.rfb.entry.ServerMain;
 import me.eigenraven.lwjgl3ify.rfb.transformers.*;
 import me.eigenraven.lwjgl3ify.rfb.transformers.mod.*;
 
@@ -46,9 +47,7 @@ public class Lwjgl3ifyRfbPlugin implements RfbPlugin {
 
         // TODO: Look into why these get loaded with LWJGL3ify
         // Unload classes which shouldn't be loaded on serverside
-        try {
-            Class.forName("net.minecraft.client.AnvilConverterException", false, Launch.classLoader);
-        } catch (ClassNotFoundException ignored) {
+        if (ServerMain.isServer) {
             Launch.classLoader.addClassLoaderExclusion("landmaster.plustic.api.Toggle$Gui");
         }
     }

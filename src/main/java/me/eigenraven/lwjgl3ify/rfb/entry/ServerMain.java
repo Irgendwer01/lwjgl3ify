@@ -8,6 +8,8 @@ import java.lang.reflect.Method;
  */
 public class ServerMain {
 
+    public static boolean isServer = false;
+
     public static void main(String[] args) {
         new ServerMain().run(args);
     }
@@ -15,6 +17,7 @@ public class ServerMain {
     private ServerMain() {}
 
     private void run(String[] args) {
+        isServer = true;
         Class<?> launchwrapper = null;
         try {
             launchwrapper = Class
