@@ -13,8 +13,8 @@ public class Config {
 
     private static boolean configLoaded = false;
 
-    public static boolean MIXIN_STBI_TEXTURE_LOADING = true;
-    public static boolean MIXIN_STBI_TEXTURE_STITCHING = true;
+    public static boolean MIXIN_STBI_TEXTURE_LOADING = false;
+    public static boolean MIXIN_STBI_TEXTURE_STITCHING = false;
 
     public static boolean DEBUG_PRINT_KEY_EVENTS = false;
     public static boolean DEBUG_PRINT_MOUSE_EVENTS = false;
