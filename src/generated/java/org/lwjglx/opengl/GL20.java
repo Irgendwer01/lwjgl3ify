@@ -1,6 +1,13 @@
 package org.lwjglx.opengl;
 
+import org.lwjgl.BufferChecks;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.ContextCapabilities;
+import org.lwjgl.opengl.GLContext;
 import org.lwjgl.system.MemoryUtil;
+
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 public class GL20 {
 
@@ -151,6 +158,8 @@ public class GL20 {
         org.lwjgl.opengl.GL20.glGetActiveAttrib(program, index, length, size, type, name);
     }
 
+
+
     public static void glGetActiveUniform(int program, int index, java.nio.IntBuffer length, java.nio.IntBuffer size,
         java.nio.IntBuffer type, java.nio.ByteBuffer name) {
         org.lwjgl.opengl.GL20.glGetActiveUniform(program, index, length, size, type, name);
@@ -163,6 +172,15 @@ public class GL20 {
             maxLength,
             MemoryUtil.memSlice(sizeType, 0, 1),
             MemoryUtil.memSlice(sizeType, 1, 1));
+    }
+
+    public static String glGetActiveUniform(int program, int index, int maxLength) {
+        return org.lwjgl.opengl.GL20.glGetActiveUniform(
+            program,
+            index,
+            maxLength,
+            BufferUtils.createIntBuffer(1),
+            BufferUtils.createIntBuffer(1));
     }
 
     public static void glGetAttachedShaders(int program, java.nio.IntBuffer count, java.nio.IntBuffer shaders) {
