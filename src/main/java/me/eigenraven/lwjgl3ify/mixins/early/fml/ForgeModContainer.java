@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import me.eigenraven.lwjgl3ify.api.ICapabilityManagerAccessor;
 
 // TODO: Find out what causes this
-// Fixes Capabilities not working on Server-side
+// Fixes Capabilities not working on Server-side, thanks to unilock for the patch
 @Mixin(value = net.minecraftforge.common.ForgeModContainer.class, remap = false)
 public class ForgeModContainer {
 
