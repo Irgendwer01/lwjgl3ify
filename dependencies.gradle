@@ -21,7 +21,9 @@ def enable_gaspunk = false
 def enable_universaltweaks = false
 def enable_ic2 = false
 def enable_tconstruct = false
-def enable_botania = true
+def enable_botania = false
+def enable_gregtech = false
+
 
 
 def modDeps = [
@@ -38,10 +40,13 @@ def modDeps = [
     'curse.maven:plustic-376903:4703532': enable_tconstruct,
     'curse.maven:mantle-74924:2713386' : enable_tconstruct,
     'curse.maven:botania-225643:3330934' : enable_botania,
+    'curse.maven:gregtech-557242:5519022' : enable_gregtech,
 
-    // Dependencies needed by other Mods, thus letting them always on
+    // (Optional) Dependencies needed by other Mods, thus letting them always on
     'com.cleanroommc:configanytime:3.0': true,
     'curse.maven:baubles-227083:2518667': true,
+    'curse.maven:codechickenlib-242818:2779848': true,
+    'curse.maven:ctm-267602:2915363': true,
 
     // Cannot be used in runClient (Needs fixing in RFG)
     'curse.maven:EIO-64578:4674244': false,
