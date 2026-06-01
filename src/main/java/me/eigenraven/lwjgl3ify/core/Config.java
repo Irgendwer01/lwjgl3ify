@@ -14,18 +14,25 @@ public class Config {
     private static boolean configLoaded = false;
 
     public static boolean MIXIN_STBI_TEXTURE_LOADING = true;
-    public static boolean MIXIN_STBI_TEXTURE_STICHING = true;
+    public static boolean MIXIN_STBI_TEXTURE_STITCHING = true;
     public static boolean MIXIN_STBI_IGNORE_FASTCRAFT = false;
 
     public static boolean DEBUG_PRINT_KEY_EVENTS = false;
     public static boolean DEBUG_PRINT_MOUSE_EVENTS = false;
+    public static boolean DEBUG_PRINT_WINDOW_EVENTS = false;
     public static boolean DEBUG_REGISTER_OPENGL_LOGGER = false;
 
     public static boolean SHOW_JAVA_VERSION = true;
     public static boolean SHOW_LWJGL_VERSION = true;
 
     public static boolean WINDOW_START_MAXIMIZED = false, WINDOW_START_FOCUSED = true, WINDOW_START_ICONIFIED = false;
+    public static boolean WINDOW_CENTERED = true;
     public static boolean WINDOW_DECORATED = true;
+    public static boolean WINDOW_LOADING_PROGRESS = true;
+    public static boolean WINDOW_BORDERLESS_REPLACES_FULLSCREEN = false;
+    public static boolean WINDOW_BORDERLESS_WINDOWS_COMPATIBILITY = true;
+    public static boolean WINDOW_HIDPI_RENDERING = true;
+    public static boolean WINDOW_LINUX_DESKTOP_ENTRY = true;
     public static boolean OPENGL_DEBUG_CONTEXT = false;
     public static boolean OPENGL_SRGB_CONTEXT = false;
     public static boolean OPENGL_DOUBLEBUFFER = true;
@@ -39,9 +46,10 @@ public class Config {
     public static boolean INPUT_CTRL_ALT_TEXT = false;
     public static boolean INPUT_ALTGR_ESCAPE_CODES = false;
     public static boolean INPUT_RAW_MOUSE = false;
+    public static boolean INPUT_ALWAYS_REPEAT_KEYS = false;
+    public static boolean FORCE_DISCRETE_SCROLLING = false;
 
-    public static String X11_CLASS_NAME = "minecraft";
-    public static String COCOA_FRAME_NAME = "minecraft";
+    public static String APP_ID = "com.gtnewhorizons.Lwjgl3ifyMinecraft";
 
     public static String LWJGL3IFY_VERSION = Tags.VERSION;
 
@@ -80,11 +88,11 @@ public class Config {
             "stbiTextureLoading",
             CATEGORY_MIXIN,
             MIXIN_STBI_TEXTURE_LOADING,
-            "Use the faster stb_image-based texture loader");
-        MIXIN_STBI_TEXTURE_STICHING = config.getBoolean(
-            "stbiTextureStiching",
+            "Use the faster spng-based texture loader");
+        MIXIN_STBI_TEXTURE_STITCHING = config.getBoolean(
+            "stbiTextureStitching",
             CATEGORY_MIXIN,
-            MIXIN_STBI_TEXTURE_STICHING,
+            MIXIN_STBI_TEXTURE_STITCHING,
             "Use the much faster stb_rectpack-based texture stitcher");
         MIXIN_STBI_IGNORE_FASTCRAFT = config.getBoolean(
             "stbiIgnoreFastcraft",
@@ -102,6 +110,11 @@ public class Config {
             CATEGORY_DEBUG,
             DEBUG_PRINT_MOUSE_EVENTS,
             "Print mouse-related events to the log");
+        DEBUG_PRINT_WINDOW_EVENTS = config.getBoolean(
+            "printWindowEvents",
+            CATEGORY_DEBUG,
+            DEBUG_PRINT_WINDOW_EVENTS,
+            "Print window-related events to the log");
         DEBUG_REGISTER_OPENGL_LOGGER = config.getBoolean(
             "registerOpenGLLogger",
             CATEGORY_DEBUG,
@@ -118,21 +131,42 @@ public class Config {
         WINDOW_START_FOCUSED = config.getBoolean("focused", CATEGORY_WINDOW, WINDOW_START_FOCUSED, "Start focused?");
         WINDOW_START_ICONIFIED = config
             .getBoolean("iconified", CATEGORY_WINDOW, WINDOW_START_ICONIFIED, "Start iconified?");
+        WINDOW_CENTERED = config.getBoolean("centered", CATEGORY_WINDOW, WINDOW_CENTERED, "Start centered?");
+        WINDOW_BORDERLESS_REPLACES_FULLSCREEN = config.getBoolean(
+            "borderless",
+            CATEGORY_WINDOW,
+            WINDOW_BORDERLESS_REPLACES_FULLSCREEN,
+            "Should exclusive fullscreen mode replaced with borderless fullscreen mode");
+        WINDOW_BORDERLESS_WINDOWS_COMPATIBILITY = config.getBoolean(
+            "borderlessWindowsCompatibility",
+            CATEGORY_WINDOW,
+            WINDOW_BORDERLESS_WINDOWS_COMPATIBILITY,
+            "Windows-only - should borderless window have height increased by 1 to solve flickering on un-focusing");
         WINDOW_DECORATED = config.getBoolean(
             "decorated",
             CATEGORY_WINDOW,
             WINDOW_DECORATED,
             "Should the window have decorations (titlebar, border, close button)");
-        X11_CLASS_NAME = config.getString(
-            "x11ClassName",
+        WINDOW_LOADING_PROGRESS = config.getBoolean(
+            "showLoadingProgress",
             CATEGORY_WINDOW,
-            X11_CLASS_NAME,
-            "Linux-only - change the X11 class name, which is used by your window manager to identify the running application");
-        COCOA_FRAME_NAME = config.getString(
-            "cocoaFrameName",
+            WINDOW_LOADING_PROGRESS,
+            "Show game loading progress in the task bar on supported systems");
+        APP_ID = config.getString(
+            "appId",
             CATEGORY_WINDOW,
-            COCOA_FRAME_NAME,
-            "OSX-only - identifier used to save and restore the window position and size");
+            APP_ID,
+            "Changes the application ID used for categorizing windows in window managers, saving per-app settings etc.");
+        WINDOW_HIDPI_RENDERING = config.getBoolean(
+            "hidpiRendering",
+            CATEGORY_WINDOW,
+            WINDOW_HIDPI_RENDERING,
+            "Enables high DPI rendering in the window, make sure to increase your GUI scale in options if enabled");
+        WINDOW_LINUX_DESKTOP_ENTRY = config.getBoolean(
+            "linuxCreateAppDesktopEntry",
+            CATEGORY_WINDOW,
+            WINDOW_LINUX_DESKTOP_ENTRY,
+            "On Linux only, creates a hidden .desktop file in your XDG_DATA_HOME/applications folder matching the appId to improve Wayland support");
 
         INPUT_INVERT_WHEEL = config
             .getBoolean("invertScrollWheel", CATEGORY_INPUT, INPUT_INVERT_WHEEL, "Invert scrolling direction");
@@ -160,6 +194,16 @@ public class Config {
             "Allows AltGr use in Ctrl+key special key combinations (disables text character input handling when AltGr is pressed)");
         INPUT_RAW_MOUSE = config
             .getBoolean("rawMouseInput", CATEGORY_INPUT, INPUT_RAW_MOUSE, "Use raw (unaccelerated) mouse input");
+        INPUT_ALWAYS_REPEAT_KEYS = config.getBoolean(
+            "alwaysRepeatKeys",
+            CATEGORY_INPUT,
+            INPUT_ALWAYS_REPEAT_KEYS,
+            "Always create repeat key press events when a key is held, instead of letting the game control the setting at runtime.");
+        FORCE_DISCRETE_SCROLLING = config.getBoolean(
+            "forceDiscreteScrolling",
+            CATEGORY_INPUT,
+            FORCE_DISCRETE_SCROLLING,
+            "Forces all scrolling events to receive a discrete mouse wheel value, this can fix problems when scrolling doesn't change slot");
 
         OPENGL_DEBUG_CONTEXT = config.getBoolean(
             "debugContext",

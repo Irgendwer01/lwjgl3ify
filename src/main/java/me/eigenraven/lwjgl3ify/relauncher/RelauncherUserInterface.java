@@ -10,8 +10,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -23,15 +25,12 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.DefaultEditorKit;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.github.weisj.darklaf.LafManager;
-import com.github.weisj.darklaf.theme.spec.ColorToneRule;
-import com.github.weisj.darklaf.theme.spec.ContrastRule;
-import com.github.weisj.darklaf.theme.spec.PreferredThemeStyle;
 import com.google.common.base.Throwables;
 
 /** Implements the UI components of the relauncher */
@@ -66,9 +65,15 @@ public class RelauncherUserInterface {
             .setContextClassLoader(mcLoader);
         try {
             System.setProperty("awt.useSystemAAFontSettings", "on");
-            LafManager.installTheme(new PreferredThemeStyle(ContrastRule.STANDARD, ColorToneRule.DARK));
+            if (System.getProperty("os.name")
+                .toLowerCase(Locale.ROOT)
+                .contains("linux")) {
+                UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+            } else {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            }
         } catch (Exception e) {
-            Relauncher.logger.warn("Could not initialize DarkLaf GUI theme", e);
+            Relauncher.logger.warn("Could not initialize GUI theme", e);
         }
         Thread.currentThread()
             .setContextClassLoader(original);
@@ -117,6 +122,8 @@ public class RelauncherUserInterface {
             dlThread.setDaemon(true);
 
             final AtomicBoolean normallyTerminated = new AtomicBoolean(false);
+            final AtomicReference<Throwable> dlException = new AtomicReference<>(null);
+            dlThread.setUncaughtExceptionHandler((_thread, exception) -> dlException.set(exception));
 
             final Timer updater = new Timer(1000 / 120, al -> {
                 final int remaining = dler.remainingTasks();
@@ -128,6 +135,13 @@ public class RelauncherUserInterface {
                         dlThread.join();
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
+                    }
+                    final Throwable exception = dlException.get();
+                    if (exception != null) {
+                        dialogContent.filesLabel.setText(
+                            "Exception happened when downloading required files, check the log for details.\n"
+                                + exception);
+                        throw Throwables.propagate(exception);
                     }
                     normallyTerminated.set(true);
                     progressDialog.dispose();

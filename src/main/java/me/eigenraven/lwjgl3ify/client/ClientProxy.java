@@ -1,15 +1,22 @@
 package me.eigenraven.lwjgl3ify.client;
 
+import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
 
+import org.lwjgl.sdl.SDLVersion;
+import org.lwjgl.sdl.SDLVideo;
 import org.lwjglx.input.Keyboard;
 import org.lwjglx.opengl.Display;
 
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.ProgressManager;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import me.eigenraven.lwjgl3ify.CommonProxy;
 import me.eigenraven.lwjgl3ify.api.InputEvents;
@@ -18,7 +25,7 @@ import me.eigenraven.lwjgl3ify.core.Config;
 public class ClientProxy extends CommonProxy {
 
     static final String javaVersion;
-    static final String lwjglVersion = "LWJGL: " + org.lwjgl.Version.getVersion();
+    static final String lwjglVersion;
 
     static {
         String javaVersionRaw = "Java: " + System.getProperty("java.version");
@@ -26,6 +33,12 @@ public class ClientProxy extends CommonProxy {
             javaVersionRaw = javaVersionRaw.substring(0, 29) + "...";
         }
         javaVersion = javaVersionRaw;
+        final int sdlVer = SDLVersion.SDL_GetVersion();
+        final int sdlMajor = SDLVersion.SDL_VERSIONNUM_MAJOR(sdlVer);
+        final int sdlMinor = SDLVersion.SDL_VERSIONNUM_MINOR(sdlVer);
+        final int sdlMicro = SDLVersion.SDL_VERSIONNUM_MICRO(sdlVer);
+        lwjglVersion = String
+            .format("LWJGL: %s  SDL: %d.%d.%d", org.lwjgl.Version.getVersion(), sdlMajor, sdlMinor, sdlMicro);
     }
 
     @Override
@@ -45,20 +58,11 @@ public class ClientProxy extends CommonProxy {
     private static final class McKeybindHandler implements InputEvents.KeyboardListener {
 
         @Override
-        public void onKeyEvent(InputEvents.KeyEvent event) {
-            final Minecraft mc = Minecraft.getMinecraft();
-            if (mc == null) {
-                return;
-            }
-            if (mc.currentScreen != null) {
-                return;
-            }
-            if (event.lwjgl2KeyCode > Keyboard.KEY_NONE) {
-                KeyBinding.setKeyBindState(event.lwjgl2KeyCode, event.action != InputEvents.KeyAction.RELEASED);
-                if (event.action != InputEvents.KeyAction.RELEASED) {
-                    KeyBinding.onTick(event.lwjgl2KeyCode);
-                }
-            }
+        public void onKeyEvent(InputEvents.KeyEvent event) {}
+
+        @Override
+        public void onTextEvent(InputEvents.TextEvent event) {
+            TextFieldHandler.onTextInput(event);
         }
     }
 
@@ -67,7 +71,7 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
-    public void registerF3Handler() {
+    public void registerEventHandler() {
         MinecraftForge.EVENT_BUS.register(this);
     }
 
@@ -94,5 +98,51 @@ public class ClientProxy extends CommonProxy {
         Config.config.save();
         Config.reloadConfigObject();
         Display.lwjgl3ify$updateRawMouseMode(Config.INPUT_RAW_MOUSE);
+    }
+
+    private static final AtomicBoolean gameIsLoading = new AtomicBoolean(true);
+
+    @SubscribeEvent
+    @SuppressWarnings("unused")
+    public void onGuiChange(final GuiOpenEvent event) {
+        final GuiScreen oldScreen = Minecraft.getMinecraft().currentScreen;
+        final GuiScreen newScreen = event.gui;
+        if (gameIsLoading.get()) {
+            gameIsLoading.set(false);
+            MainThreadExec.runOnMainThread(
+                () -> { SDLVideo.SDL_SetWindowProgressState(Display.getWindow(), SDLVideo.SDL_PROGRESS_STATE_NONE); });
+        }
+        if (oldScreen != newScreen) {
+            TextFieldHandler.resetTextInput();
+        }
+    }
+
+    static float lastProgress = -1.0f;
+
+    @SuppressWarnings("deprecation")
+    public static void onProgressUpdate() {
+        if (!Config.WINDOW_LOADING_PROGRESS || !gameIsLoading.get()) {
+            return;
+        }
+        float newProgress = 0.0f;
+        float curUnit = 1.0f;
+        for (final Iterator<ProgressManager.ProgressBar> it = ProgressManager.barIterator(); it.hasNext();) {
+            final ProgressManager.ProgressBar bar = it.next();
+            final float barUnit = 1.0f / (bar.getSteps() + 1);
+            final float barProgress = (bar.getStep() + 1) * barUnit;
+            newProgress += curUnit * barProgress;
+            curUnit *= barUnit;
+        }
+        newProgress = Math.max(0.0f, Math.min(newProgress, 1.0f));
+        if (Math.abs(newProgress - lastProgress) < 0.01f) {
+            return;
+        }
+        final float finalNewProgress = newProgress;
+        MainThreadExec.runOnMainThread(() -> {
+            final long window = Display.getWindow();
+            SDLVideo.SDL_SetWindowProgressState(window, SDLVideo.SDL_PROGRESS_STATE_NORMAL);
+            SDLVideo.SDL_SetWindowProgressValue(window, finalNewProgress);
+        });
+        lastProgress = finalNewProgress;
     }
 }

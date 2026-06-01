@@ -5,7 +5,9 @@ Bundles [RetroFuturaBootstrap](https://github.com/GTNewHorizons/RetroFuturaBoots
 
 # Usage
 
-Lwjgl3ify depends on Unimixins (<https://github.com/LegacyModdingMC/UniMixins/>), use at least version 0.1.7 with the GTNHMixins module.
+Lwjgl3ify depends on:
+ - Unimixins (<https://github.com/LegacyModdingMC/UniMixins/>), use at least version 0.1.23 with the GTNHMixins module.
+
 Hodgepodge (<https://github.com/GTNewHorizons/Hodgepodge>) is strongly recommended, it has many Java 17+ compatibility patches for ARR mods (Biomes'o'Plenty, Witchery, JourneyMap, and more) which we could not directly fix in the GTNH forks.
 
 ## Client
@@ -24,17 +26,17 @@ The forgePatches jar will get automatically downloaded by the launcher.
 Make sure you have installed the UniMixins GTNHMixins and Mixin modules, or the all modules combined jar.
 
 Change the instance java version to 17.0.6, 19.0.2, 20 or 21 (or newer), these are the currently supported versions.
-You can also use Java 11 if you remove the `-Djava.security.manager=allow` argument from `patches/me.eigenraven.lwjgl3ify.forgepatches.json`.
 
 ### MultiMC setup (GTNH and non-GTNH)
 
 > [!IMPORTANT]
+> If you're using GTNH 2.8.1 or older, use the lwjgl3ify 2.x arguments from <https://github.com/GTNewHorizons/lwjgl3ify/blob/19bdc08297eca6975beaf0886ceca3bbc83cf368/README.MD#multimc-setup-gtnh-and-non-gtnh>.
 > If you're using GTNH 2.5.1 or older, use the lwjgl3ify 1.x arguments from <https://github.com/GTNewHorizons/lwjgl3ify/blob/2229295b9fe5ed3304f62288f76f84bdb79ff5bb/README.MD#multimc-setup-gtnh-and-non-gtnh>.
-> The following arguments are relevant to the 2.x version.
+> The following arguments are relevant to the 3.x version.
 
-For MultiMC, you need to manually put in extra java arguments, prismlauncher can load them from the patches json files automatically:
+For MultiMC, you need to manually put in extra java arguments, Prism Launcher can load them from the patches json files automatically:
 ```
--Dfile.encoding=UTF-8 -Djava.system.class.loader=com.gtnewhorizons.retrofuturabootstrap.RfbSystemClassLoader -Djava.security.manager=allow --add-opens java.base/jdk.internal.loader=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.base/java.text=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/jdk.internal.reflect=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens jdk.naming.dns/com.sun.jndi.dns=ALL-UNNAMED,java.naming --add-opens java.desktop/sun.awt=ALL-UNNAMED --add-opens java.desktop/sun.awt.image=ALL-UNNAMED --add-opens jdk.dynalink/jdk.dynalink.beans=ALL-UNNAMED --add-opens java.sql.rowset/javax.sql.rowset.serial=ALL-UNNAMED
+-Dfile.encoding=UTF-8 -Djava.system.class.loader=com.gtnewhorizons.retrofuturabootstrap.RfbSystemClassLoader --enable-native-access ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED --add-opens java.base/java.lang.invoke=ALL-UNNAMED --add-opens java.base/java.lang.ref=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.net.spi=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/java.nio.channels=ALL-UNNAMED --add-opens java.base/java.nio.charset=ALL-UNNAMED --add-opens java.base/java.nio.file=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/java.text=ALL-UNNAMED --add-opens java.base/java.time.chrono=ALL-UNNAMED --add-opens java.base/java.time.format=ALL-UNNAMED --add-opens java.base/java.time.temporal=ALL-UNNAMED --add-opens java.base/java.time.zone=ALL-UNNAMED --add-opens java.base/java.time=ALL-UNNAMED --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens java.base/java.util.concurrent.locks=ALL-UNNAMED --add-opens java.base/java.util.jar=ALL-UNNAMED --add-opens java.base/java.util.zip=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/jdk.internal.loader=ALL-UNNAMED --add-opens java.base/jdk.internal.misc=ALL-UNNAMED --add-opens java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/jdk.internal.reflect=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.desktop/com.sun.imageio.plugins.png=ALL-UNNAMED --add-opens java.desktop/sun.awt.image=ALL-UNNAMED --add-opens java.desktop/sun.awt=ALL-UNNAMED --add-opens java.desktop/sun.lwawt.macosx=ALL-UNNAMED --add-opens java.sql.rowset/javax.sql.rowset.serial=ALL-UNNAMED --add-opens jdk.dynalink/jdk.dynalink.beans=ALL-UNNAMED --add-opens jdk.naming.dns/com.sun.jndi.dns=ALL-UNNAMED,java.naming
 ```
 
 ### (Experimental) Relauncher installation
@@ -47,7 +49,7 @@ If you want to tweak your default window size, OpenGL context properties or othe
 
 ## Server
 First, install a working 1.7.10 Forge server, from a modpack zip or using forge's installer.
-Then, install the mod jar (and unimixins, hodgepodge and gtnhlib as needed) in `mods/`, and download the `forgePatches` jar. Put the forgePatches jar in the same folder as your forge-universal and minecraft server jars.
+Then, install the mod jar (and unimixins, hodgepodge as needed) in `mods/`, and download the `forgePatches` jar. Put the forgePatches jar in the same folder as your forge-universal and minecraft server jars.
 **Thermos/Crucible/Hybrid servers are not supported!**.
 Lwjgl3ify also depends on Unimixins (<https://github.com/LegacyModdingMC/UniMixins/>), use at least version 0.1.7.
 Rename the forgePatches jar to just `lwjgl3ify-forgePatches.jar`. Create a file named `java9args.txt` with the contents of [the file in this repository](java9args.txt).
@@ -57,7 +59,9 @@ java -Xmx6G -Xms6G @java9args.txt -jar lwjgl3ify-forgePatches.jar nogui
 ```
 
 # LiteLoader compatibility
-If you install LiteLoader via MultiMC or a fork like PrismLauncher, make sure to move the "LiteLoader" entry above the "LWJGL3ify Launch Args" entry, otherwise the launch will fail.
+To use LiteLoader with lwjgl3ify/RetroFuturaBootstrap the LiteloaderLoader by Midnight is required.
+
+The install instructions can be found at [Midnight145/LiteloaderLoader/INSTALLATION.md](https://github.com/Midnight145/LiteloaderLoader/blob/master/INSTALLATION.md).
 
 # How does it work?
 
@@ -90,7 +94,7 @@ There are a few components to enabling modern java and lwjgl usage on old minecr
    - FMLSecurityManager: fix some array index out of bounds exceptions, it is also deprecated in java 17 and will need to be replaced once a new API is available
    - EnumHelper: replace all the enumhelper apis with new variants using the extensible enum transformer and unsafe hacks.
  - Additional performance-enhancing mixins making use of LWJGL3 features:
-   - STB_image-based image loader, much faster than Image4J
+   - spng-based image loader, much faster than Image4J
    - STB_rectpack-based texture sticher, it's nearly instant with tens of thousands of textures, compared to the vanilla code which takes many seconds to stitch that many textures into an atlas
 
 ## Fixing mods
@@ -168,3 +172,5 @@ This can lead to inconsistent states, where some methods might see the old value
 
 First, do `./gradlew build` and use the zip in `./build/distributions/lwjgl3ify-VERSION-multimc.zip` to install lwjgl3ify into a 1.7.10 forge instance in Prism.
 Install the mod jar from `./build/libs/` as usual.
+
+When testing in the deobfuscated environment, please use the `runClient`/`runServer` tasks that run with modern java by default. `runClient17` et al. are no-ops.

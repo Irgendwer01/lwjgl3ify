@@ -1,21 +1,27 @@
 package org.lwjglx.input;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_UNKNOWN;
+import static org.lwjgl.sdl.SDLKeyboard.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Map;
+import java.nio.ByteBuffer;
+import java.util.Locale;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringUtils;
-import org.lwjgl.glfw.GLFW;
-import org.lwjglx.LWJGLException;
+import org.lwjgl.sdl.SDLKeycode;
+import org.lwjgl.sdl.SDLScancode;
 import org.lwjglx.Sys;
 import org.lwjglx.opengl.Display;
 
+import com.google.common.base.Objects;
+
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import me.eigenraven.lwjgl3ify.Lwjgl3ify;
+import me.eigenraven.lwjgl3ify.api.InputEvents;
+import me.eigenraven.lwjgl3ify.client.MainThreadExec;
 import me.eigenraven.lwjgl3ify.core.Config;
 
 public class Keyboard {
@@ -165,7 +171,10 @@ public class Keyboard {
 
     public static final int keyCount;
 
-    private static final Map<String, Integer> reverseKeyMap = new ConcurrentHashMap<>();
+    public static ByteBuffer sdlKeyPressedArray;
+
+    private static final TIntObjectHashMap<String> keyMap = new TIntObjectHashMap<>(512, 0.5f);
+    private static final TObjectIntHashMap<String> reverseKeyMap = new TObjectIntHashMap<>(512, 0.5f, -1);
 
     public enum KeyState {
 
@@ -180,7 +189,7 @@ public class Keyboard {
         }
     }
 
-    private static boolean doRepeatEvents = true;
+    private static boolean doRepeatEvents = false;
 
     public static final int KEYBOARD_SIZE = Short.MAX_VALUE;
     public static Queue<KeyEvent> eventQueue = new ArrayBlockingQueue<>(256);
@@ -216,18 +225,21 @@ public class Keyboard {
                 unlocalizedKeyNameMiniLut[i] = "Key " + i;
             }
         }
-        eventQueue.add(new KeyEvent(0, '\0', KeyState.RELEASE, Sys.getNanoTime()));
+        eventQueue.add(new KeyEvent(0, 0, '\0', KeyState.RELEASE, Sys.getNanoTime()));
     }
 
     /** Populates the key name->index lookup table with the current keyboard layout based names. */
     public static void populateKeyLookupTables() {
+        keyMap.clear();
+        reverseKeyMap.clear();
         for (int key = 0; key <= 255; key++) {
             getKeyName(key);
         }
     }
 
     public static void addRawKeyEvent(KeyEvent event) {
-        if (event == null || (event.state == KeyState.REPEAT && !doRepeatEvents)) {
+        boolean actuallyDoRepeatEvents = doRepeatEvents || Config.INPUT_ALWAYS_REPEAT_KEYS;
+        if (event == null || (event.state == KeyState.REPEAT && !actuallyDoRepeatEvents)) {
             return;
         }
         if (Config.DEBUG_PRINT_KEY_EVENTS) {
@@ -236,41 +248,46 @@ public class Keyboard {
                 event.key,
                 event.state,
                 event.state,
-                java.awt.event.KeyEvent.getKeyText(KeyCodes.lwjglToAwt(KeyCodes.glfwToLwjgl(event.key))),
-                (event.key >= 32 && event.key < 127) ? ((char) event.key) : '?');
+                java.awt.event.KeyEvent.getKeyText(KeyCodes.lwjglToAwt(event.key)),
+                (event.key >= 32 && event.key < 127) ? (event.key) : '?');
         }
         try {
             eventQueue.add(event);
         } catch (IllegalStateException ignored) {}
     }
 
-    public static void addGlfwKeyEvent(long window, int key, int scancode, int action, int mods, char c) {
+    public static void addSdlKeyEvent(int key, int scancode, InputEvents.KeyAction action, int mods, int c,
+        long nanoTime) {
         final KeyState state = switch (action) {
-            case GLFW.GLFW_PRESS -> KeyState.PRESS;
-            case GLFW.GLFW_RELEASE -> KeyState.RELEASE;
-            case GLFW.GLFW_REPEAT -> KeyState.REPEAT;
-            default -> KeyState.RELEASE;
+            case PRESSED -> KeyState.PRESS;
+            case RELEASED -> KeyState.RELEASE;
+            case REPEATED -> KeyState.REPEAT;
         };
-        addRawKeyEvent(new KeyEvent(KeyCodes.glfwToLwjgl(key), c, state, Sys.getNanoTime()));
+        addRawKeyEvent(
+            new KeyEvent(KeyCodes.sdlScancodeToLwjgl(scancode), KeyCodes.sdlKeycodeToLwjgl(key), c, state, nanoTime));
     }
 
-    public static void addCharEvent(int key, char c) {
+    public static void addCharEvent(int key, int c) {
         if (Config.DEBUG_PRINT_KEY_EVENTS) {
-            Lwjgl3ify.LOG.info("[DEBUG-KEY-QUEUE] queued char virtual keypress codepoint:{} char:{}", (int) c, c);
+            Lwjgl3ify.LOG.info("[DEBUG-KEY-QUEUE] queued char virtual keypress codepoint:{} char:{}", c, c);
         }
         try {
-            eventQueue.add(new KeyEvent(KEY_NONE, c, KeyState.PRESS, Sys.getNanoTime()));
+            eventQueue.add(new KeyEvent(KEY_NONE, KEY_NONE, c, KeyState.PRESS, Sys.getNanoTime()));
         } catch (IllegalStateException ignored) {}
     }
 
-    public static void create() throws LWJGLException {}
+    public static void create() {}
 
     public static boolean isKeyDown(int key) {
-        if (key == KEY_NONE) {
+        final ByteBuffer array = sdlKeyPressedArray;
+        if (key == KEY_NONE || array == null) {
             return false;
         }
-        final int keyCode = KeyCodes.lwjglToGlfw(key);
-        return keyCode != GLFW_KEY_UNKNOWN && GLFW.glfwGetKey(Display.getWindow(), keyCode) == GLFW.GLFW_PRESS;
+        final int sdlScancode = KeyCodes.lwjglToSdlScancode(key);
+        if (sdlScancode <= 0 || sdlScancode >= array.limit()) {
+            return false;
+        }
+        return array.get(sdlScancode) != 0;
     }
 
     public static void poll() {
@@ -309,9 +326,16 @@ public class Keyboard {
         return eventQueue.peek().key;
     }
 
-    public static char getEventCharacter() {
-        return eventQueue.peek().aChar;
+    public static int lwjgl3ify$getEventKeyNonScancode() {
+        return eventQueue.peek().keyNonScancode;
+    }
 
+    public static char getEventCharacter() {
+        return (char) eventQueue.peek().codepoint;
+    }
+
+    public static int lwjgl3ify$getEventCodePoint() {
+        return eventQueue.peek().codepoint;
     }
 
     public static boolean getEventKeyState() {
@@ -322,32 +346,36 @@ public class Keyboard {
         return eventQueue.peek().nano;
     }
 
-    public static String getKeyName(int key) {
+    public static synchronized String getKeyName(int key) {
         if (key == KEY_NONE) {
             return "NONE";
         }
-        // GLFW caches this internally, and knows when keyboard layouts switch.
-        final String glfwName = StringUtils.toRootUpperCase(GLFW.glfwGetKeyName(KeyCodes.lwjglToGlfw(key), 0));
-        final String name;
-        if (glfwName == null) {
-            if (key >= 0 && key < unlocalizedKeyNameMiniLut.length) {
-                name = unlocalizedKeyNameMiniLut[key];
-            } else {
-                name = "Key " + key;
-            }
-        } else {
-            name = glfwName;
+        final String cached = keyMap.get(key);
+        if (cached != null) {
+            return cached;
         }
+        int sdlScan = KeyCodes.lwjglToSdlScancode(key);
+        if (sdlScan == -1 || sdlScan == SDLScancode.SDL_SCANCODE_UNKNOWN) {
+            return "Key " + key;
+        }
+        int sdlKey = SDL_GetKeyFromScancode(sdlScan, (short) 0, true);
+        if (sdlKey == SDLKeycode.SDLK_UNKNOWN) {
+            return "Key " + key;
+        }
+        String name = Objects.firstNonNull(MainThreadExec.runOnMainThread(() -> SDL_GetKeyName(sdlKey)), "UNKNOWN")
+            .toUpperCase(Locale.ROOT);
+        keyMap.put(key, name);
         reverseKeyMap.put(name, key);
         return name;
     }
 
-    public static int getKeyIndex(String keyName) {
+    public static synchronized int getKeyIndex(String keyName) {
         if (keyName.equals("NONE")) {
             return KEY_NONE;
         }
-        Integer ret = reverseKeyMap.get(keyName);
-        if (ret == null) {
+
+        int ret = reverseKeyMap.get(keyName);
+        if (ret == -1) {
             if (keyName.matches("Key -?[0-9]+]")) {
                 return Integer.parseInt(StringUtils.removeStart(keyName, "Key "));
             }
@@ -364,22 +392,42 @@ public class Keyboard {
     public static final class KeyEvent {
 
         public int key;
-        public char aChar;
+        public int keyNonScancode;
+        public int codepoint;
         public KeyState state;
         public long nano;
         public boolean queueOutOfOrderRelease = false;
 
-        public KeyEvent(int key, char aChar, KeyState state, long nano) {
-            this.key = key;
-            this.aChar = aChar;
+        public KeyEvent(int key, int keyNonScancode, int codepoint, KeyState state, long nano) {
+            this.key = shouldTreatAsScancode(key) ? key : keyNonScancode;
+            this.keyNonScancode = keyNonScancode;
+            this.codepoint = codepoint;
             this.state = state;
             this.nano = nano;
         }
 
         public KeyEvent copy() {
-            final KeyEvent ev = new KeyEvent(key, aChar, state, nano);
+            final KeyEvent ev = new KeyEvent(key, keyNonScancode, codepoint, state, nano);
             ev.queueOutOfOrderRelease = this.queueOutOfOrderRelease;
             return ev;
         }
+
+        /**
+         * These are all the keys where we use the actual keycodes as inputs to respect different keyboard
+         * layouts/remappings better
+         */
+        public static boolean shouldTreatAsScancode(int lwjglKey) {
+            return switch (lwjglKey) {
+                // spotless:off
+                case Keyboard.KEY_ESCAPE, Keyboard.KEY_HOME,
+                     Keyboard.KEY_NUMLOCK, Keyboard.KEY_CAPITAL, Keyboard.KEY_SCROLL,
+                     Keyboard.KEY_LCONTROL , Keyboard.KEY_LSHIFT, Keyboard.KEY_LMETA, Keyboard.KEY_LMENU,
+                     Keyboard.KEY_RCONTROL , Keyboard.KEY_RSHIFT, Keyboard.KEY_RMETA, Keyboard.KEY_RMENU
+                    -> false;
+                // spotless:on
+                default -> true;
+            };
+        }
+
     }
 }
